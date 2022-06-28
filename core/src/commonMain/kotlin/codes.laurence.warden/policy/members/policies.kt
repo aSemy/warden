@@ -31,23 +31,31 @@ class ForAnyMemberPolicy(
                 if (member !is Map<*, *>) {
                     throw InvalidMemberException("Members must be a Map")
                 }
-                var grantedByAllPolicies = true
+                var deniedBy: AccessResponse? = null
                 memberPolicies.forEach { policy ->
                     val response = policy.checkAuthorized(member, accessRequest)
                     if (response.access is Access.Denied) {
-                        grantedByAllPolicies = false
+                        deniedBy = response
                     }
                 }
-                if (grantedByAllPolicies) {
+                if (deniedBy == null) {
                     return AccessResponse(
                         access = Access.Granted(),
-                        request = accessRequest
+                        request = accessRequest,
+                        trace = AccessEvaluationTrace(
+                            policyDescription = policyBasicDescription(this),
+                            access = Access.Granted(),
+                        )
                     )
                 }
             }
             return AccessResponse(
                 access = Access.Denied(),
-                request = accessRequest
+                request = accessRequest,
+                trace = AccessEvaluationTrace(
+                    policyDescription = policyBasicDescription(this),
+                    access = Access.Denied(),
+                )
             )
         } catch (e: InvalidMemberException) {
             val access = Access.Denied()
