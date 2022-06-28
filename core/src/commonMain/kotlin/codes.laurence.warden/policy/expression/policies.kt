@@ -22,7 +22,7 @@ data class ExpressionPolicy(
     val leftOperand: ValueReference,
     val operatorType: OperatorType,
     val rightOperand: ValueReference,
-    override val id: String? = null,
+    override val name: String? = null,
 ) : Policy {
 
     override fun checkAuthorized(accessRequest: AccessRequest): AccessResponse {

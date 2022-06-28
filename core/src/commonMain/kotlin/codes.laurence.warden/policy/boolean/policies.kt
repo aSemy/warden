@@ -13,14 +13,14 @@ import codes.laurence.warden.policy.collections.CollectionBasedPolicy
 @PolicyDSL
 class AllOf(
     policies: List<Policy>,
-    override val id: String? = null,
+    override val name: String? = null,
 ) : Policy, CollectionBasedPolicy(policies.toMutableList()) {
 
-    constructor(id: String? = null, builder: CollectionBasedPolicy.() -> Unit) : this(mutableListOf(), id) {
+    constructor(name: String? = null, builder: CollectionBasedPolicy.() -> Unit) : this(mutableListOf(), name) {
         this.builder()
     }
 
-    constructor(vararg policies: Policy, id: String? = null) : this(policies.toMutableList(), id)
+    constructor(vararg policies: Policy, name: String? = null) : this(policies.toMutableList(), name)
 
     override fun checkAuthorized(accessRequest: AccessRequest): AccessResponse {
         if (policies.isEmpty()) {
@@ -47,14 +47,14 @@ class AllOf(
 @PolicyDSL
 class AnyOf(
     policies: List<Policy>,
-    override val id: String? = null
+    override val name: String? = null
 ) : Policy, CollectionBasedPolicy(policies.toMutableList()) {
 
-    constructor(id: String? = null, builder: CollectionBasedPolicy.() -> Unit) : this(mutableListOf(), id) {
+    constructor(name: String? = null, builder: CollectionBasedPolicy.() -> Unit) : this(mutableListOf(), name) {
         this.builder()
     }
 
-    constructor(vararg policies: Policy, id: String? = null) : this(policies.toMutableList(), id)
+    constructor(vararg policies: Policy, name: String? = null) : this(policies.toMutableList(), name)
 
     override fun checkAuthorized(accessRequest: AccessRequest): AccessResponse {
         policies.forEach {
@@ -78,7 +78,7 @@ class AnyOf(
  * Will grant access if the policy does not grant access.
  */
 @PolicyDSL
-class Not(val policy: Policy, override val id: String? = null) : Policy {
+class Not(val policy: Policy, override val name: String? = null) : Policy {
 
     override fun checkAuthorized(accessRequest: AccessRequest): AccessResponse {
         val internal = policy.checkAuthorized(accessRequest)

@@ -138,7 +138,7 @@ class ForAnyMemberPolicyTest {
         )
         val accessRequest: AccessRequest = mockk()
         val memberSource: ValueReference = mockk {
-            every { get(accessRequest) } throws NoSuchAttributeException()
+            every { get(accessRequest) } throws NoSuchAttributeException("foo")
         }
 
         val testObj = ForAnyMemberPolicy(
@@ -328,7 +328,7 @@ class ForAllMembersPolicyTest {
         )
         val accessRequest: AccessRequest = mockk()
         val memberSource: ValueReference = mockk {
-            every { get(accessRequest) } throws NoSuchAttributeException()
+            every { get(accessRequest) } throws NoSuchAttributeException("foo")
         }
 
         val testObj = ForAllMembersPolicy(

@@ -17,7 +17,7 @@ interface MemberPolicy {
 class ForAnyMemberPolicy(
     val memberSource: ValueReference,
     val memberPolicies: List<MemberPolicy>,
-    override val id: String? = null,
+    override val name: String? = null,
 ) : Policy {
 
     init {
@@ -95,7 +95,7 @@ class ForAnyMemberPolicy(
 class ForAllMembersPolicy(
     val memberSource: ValueReference,
     val memberPolicies: List<MemberPolicy>,
-    override val id: String? = null,
+    override val name: String? = null,
 ) : Policy {
 
     init {
