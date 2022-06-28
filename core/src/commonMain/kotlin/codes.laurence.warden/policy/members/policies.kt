@@ -1,11 +1,13 @@
 package codes.laurence.warden.policy.members
 
 import codes.laurence.warden.Access
+import codes.laurence.warden.AccessEvaluationTrace
 import codes.laurence.warden.AccessRequest
 import codes.laurence.warden.AccessResponse
 import codes.laurence.warden.policy.Policy
 import codes.laurence.warden.policy.PolicyDSL
 import codes.laurence.warden.policy.expression.*
+import codes.laurence.warden.trace.policyBasicDescription
 
 interface MemberPolicy {
     fun checkAuthorized(member: Map<*, *>, accessRequest: AccessRequest): AccessResponse
@@ -14,7 +16,8 @@ interface MemberPolicy {
 @PolicyDSL
 class ForAnyMemberPolicy(
     val memberSource: ValueReference,
-    val memberPolicies: List<MemberPolicy>
+    val memberPolicies: List<MemberPolicy>,
+    override val id: String? = null,
 ) : Policy {
 
     init {
@@ -47,14 +50,26 @@ class ForAnyMemberPolicy(
                 request = accessRequest
             )
         } catch (e: InvalidMemberException) {
+            val access = Access.Denied()
             return AccessResponse(
-                access = Access.Denied(),
-                request = accessRequest
+                access = access,
+                request = accessRequest,
+                trace = AccessEvaluationTrace(
+                    policyDescription = policyBasicDescription(this),
+                    access = access,
+                    note = "InvalidMember: ${e.message}",
+                )
             )
         } catch (e: NoSuchAttributeException) {
+            val access = Access.Denied()
             return AccessResponse(
-                access = Access.Denied(),
-                request = accessRequest
+                access = access,
+                request = accessRequest,
+                trace = AccessEvaluationTrace(
+                    policyDescription = policyBasicDescription(this),
+                    access = access,
+                    note = "NoSuchAttribute: ${e.message}",
+                )
             )
         }
     }
@@ -71,7 +86,8 @@ class ForAnyMemberPolicy(
 @PolicyDSL
 class ForAllMembersPolicy(
     val memberSource: ValueReference,
-    val memberPolicies: List<MemberPolicy>
+    val memberPolicies: List<MemberPolicy>,
+    override val id: String? = null,
 ) : Policy {
 
     init {

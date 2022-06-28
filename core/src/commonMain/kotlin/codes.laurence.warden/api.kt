@@ -9,7 +9,8 @@ data class AccessRequest(
 
 data class AccessResponse(
     val access: Access,
-    val request: AccessRequest
+    val request: AccessRequest,
+    val trace: AccessEvaluationTrace? = null
 )
 
 data class AccessRequestBatch(
@@ -29,6 +30,13 @@ data class FilterAccessRequest<RESOURCE>(
 data class ResourceAttributePair<RESOURCE>(
     val resource: RESOURCE,
     val attributes: Map<String, Any?>
+)
+
+data class AccessEvaluationTrace(
+    val policyDescription: String,
+    val access: Access,
+    val note: String?= null,
+    val children: List<AccessEvaluationTrace> = emptyList(),
 )
 
 sealed class Access {

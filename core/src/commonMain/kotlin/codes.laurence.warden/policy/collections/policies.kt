@@ -55,13 +55,13 @@ open class CollectionBasedPolicy(val policies: MutableList<Policy>) {
     fun notAllOf(builder: CollectionBasedPolicy.() -> Unit) {
         val allOf = AllOf()
         allOf.builder()
-        this.add(Not(allOf))
+        this.add(Not(policy = allOf))
     }
 
     fun notAnyOf(builder: CollectionBasedPolicy.() -> Unit) {
         val anyOf = AnyOf()
         anyOf.builder()
-        this.add(Not(anyOf))
+        this.add(Not(policy = anyOf))
     }
 }
 

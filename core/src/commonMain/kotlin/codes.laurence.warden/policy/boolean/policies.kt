@@ -11,13 +11,16 @@ import codes.laurence.warden.policy.collections.CollectionBasedPolicy
  * All of the policies must grant access, and at least 1 must grant access.
  */
 @PolicyDSL
-class AllOf(policies: List<Policy>) : Policy, CollectionBasedPolicy(policies.toMutableList()) {
+class AllOf(
+    policies: List<Policy>,
+    override val id: String? = null,
+) : Policy, CollectionBasedPolicy(policies.toMutableList()) {
 
-    constructor(builder: CollectionBasedPolicy.() -> Unit) : this(mutableListOf()) {
+    constructor(id: String? = null, builder: CollectionBasedPolicy.() -> Unit) : this(mutableListOf(), id) {
         this.builder()
     }
 
-    constructor(vararg policies: Policy) : this(policies.toMutableList())
+    constructor(vararg policies: Policy, id: String? = null) : this(policies.toMutableList(), id)
 
     override fun checkAuthorized(accessRequest: AccessRequest): AccessResponse {
         if (policies.isEmpty()) {
@@ -42,13 +45,16 @@ class AllOf(policies: List<Policy>) : Policy, CollectionBasedPolicy(policies.toM
  * At least 1 policy must grant access.
  */
 @PolicyDSL
-class AnyOf(policies: List<Policy>) : Policy, CollectionBasedPolicy(policies.toMutableList()) {
+class AnyOf(
+    policies: List<Policy>,
+    override val id: String? = null
+) : Policy, CollectionBasedPolicy(policies.toMutableList()) {
 
-    constructor(builder: CollectionBasedPolicy.() -> Unit) : this(mutableListOf()) {
+    constructor(id: String? = null, builder: CollectionBasedPolicy.() -> Unit) : this(mutableListOf(), id) {
         this.builder()
     }
 
-    constructor(vararg policies: Policy) : this(policies.toMutableList())
+    constructor(vararg policies: Policy, id: String? = null) : this(policies.toMutableList(), id)
 
     override fun checkAuthorized(accessRequest: AccessRequest): AccessResponse {
         policies.forEach {
@@ -72,7 +78,7 @@ class AnyOf(policies: List<Policy>) : Policy, CollectionBasedPolicy(policies.toM
  * Will grant access if the policy does not grant access.
  */
 @PolicyDSL
-class Not(val policy: Policy) : Policy {
+class Not(val policy: Policy, override val id: String? = null) : Policy {
 
     override fun checkAuthorized(accessRequest: AccessRequest): AccessResponse {
         val internal = policy.checkAuthorized(accessRequest)

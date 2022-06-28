@@ -1,6 +1,7 @@
 package codes.laurence.warden.policy.expression
 
 import codes.laurence.warden.Access
+import codes.laurence.warden.AccessEvaluationTrace
 import codes.laurence.warden.AccessRequest
 import codes.laurence.warden.AccessResponse
 import codes.laurence.warden.policy.Policy
@@ -20,7 +21,8 @@ import codes.laurence.warden.policy.PolicyDSL
 data class ExpressionPolicy(
     val leftOperand: ValueReference,
     val operatorType: OperatorType,
-    val rightOperand: ValueReference
+    val rightOperand: ValueReference,
+    override val id: String? = null,
 ) : Policy {
 
     override fun checkAuthorized(accessRequest: AccessRequest): AccessResponse {
@@ -55,12 +57,22 @@ data class ExpressionPolicy(
                 OperatorType.CONTAINS_ALL -> checkCollection(left, right, operatorType)
             }
             return if (granted) {
-                AccessResponse(Access.Granted(), accessRequest)
+                AccessResponse(Access.Granted(), accessRequest, AccessEvaluationTrace(
+                    policyDescription = toString(),
+                    access = Access.Granted()
+                ))
             } else {
-                AccessResponse(Access.Denied(), accessRequest)
+                AccessResponse(Access.Denied(), accessRequest, AccessEvaluationTrace(
+                    policyDescription = toString(),
+                    access = Access.Denied()
+                ))
             }
         } catch (e: NoSuchAttributeException) {
-            return AccessResponse(Access.Denied(), accessRequest)
+            return AccessResponse(Access.Denied(), accessRequest, AccessEvaluationTrace(
+                policyDescription = toString(),
+                note="Attribute not found: ${e.message}",
+                access = Access.Denied()
+            ))
         }
     }
 
@@ -138,7 +150,7 @@ internal fun getValueFromAttributes(path: List<String>, attributes: Map<*, *>): 
     while (pathQueue.isNotEmpty()) {
         val pathLink = pathQueue.removeFirst()
         if (!currentAttributeMap.containsKey(pathLink)) {
-            throw NoSuchAttributeException()
+            throw NoSuchAttributeException(path.toString())
         }
         currentLinkValue = currentAttributeMap[pathLink]
         if (pathQueue.isNotEmpty()) {
@@ -147,7 +159,7 @@ internal fun getValueFromAttributes(path: List<String>, attributes: Map<*, *>): 
                 is Map<*, *> -> {
                     currentAttributeMap = currentLinkValue
                 }
-                else -> throw NoSuchAttributeException()
+                else -> throw NoSuchAttributeException("Not a map $path")
             }
         }
     }
@@ -176,4 +188,4 @@ data class AttributeReference(
     }
 }
 
-class NoSuchAttributeException : Exception()
+class NoSuchAttributeException(message: String) : Exception(message)

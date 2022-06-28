@@ -1,11 +1,11 @@
 package codes.laurence.warden.policy.expression
 
 import assertk.assertThat
-import assertk.assertions.isEqualTo
-import assertk.assertions.isInstanceOf
+import assertk.assertions.*
 import assertk.fail
 import codes.laurence.warden.AccessRequest
 import codes.laurence.warden.policy.Policy
+import codes.laurence.warden.policy.members.MemberAttributeReference
 import codes.laurence.warden.test.assertDenied
 import codes.laurence.warden.test.assertGranted
 import kotlin.test.Test
@@ -435,4 +435,26 @@ class AttributeReferenceTest {
             assertThat(e).isInstanceOf(NoSuchAttributeException::class)
         }
     }
+}
+
+class ExpressionPolicyTraceTest{
+
+    @Test
+    fun evaluateTrace(){
+        val policy = ExpressionPolicy(
+            leftOperand = AttributeReference(type = AttributeType.ACTION, path = listOf("foo", "bar")),
+            operatorType = OperatorType.CONTAINS,
+            rightOperand = MemberAttributeReference(path = listOf("fizz", "buzz"))
+        )
+
+        val result = policy.checkAuthorized(AccessRequest())
+
+        assertThat(result.trace).isNotNull().given {
+            assertThat(it.access).isEqualTo(result.access)
+            assertThat(it.children).isEmpty()
+            assertThat(it.policyDescription).isNotEmpty()
+            println(it)
+        }
+    }
+
 }

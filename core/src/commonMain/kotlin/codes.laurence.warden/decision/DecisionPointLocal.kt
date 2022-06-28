@@ -39,8 +39,8 @@ class DecisionPointLocal(
     override suspend fun checkAuthorized(request: AccessRequest): AccessResponse {
         val enriched = informationPoint.enrich(request)
         val policies = policySource.policies(request)
-        val anyOfAccessContainer = AnyOf(policies.allow)
-        val anyOfDenyContainer = AnyOf(policies.deny)
+        val anyOfAccessContainer = AnyOf(policies.allow, "ROOT_POLICY_CONTAINER")
+        val anyOfDenyContainer = AnyOf(policies.deny, "ROOT_POLICY_CONTAINER")
         val accessResult = anyOfAccessContainer.checkAuthorized(enriched)
         return when (accessResult.access) {
             is Access.Granted -> {

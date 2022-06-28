@@ -7,6 +7,7 @@ import codes.laurence.warden.AccessResponse
  * A [Policy] encapsulates the authorization logic for a given Authorization rule.
  */
 interface Policy {
+    val id: String?
     fun checkAuthorized(accessRequest: AccessRequest): AccessResponse
 }
 
